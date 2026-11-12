@@ -1,0 +1,17 @@
+# Ignore all scratch files and test scripts by default
+/*
+
+# Allow custom_components folder and its contents
+!/custom_components/
+
+# Allow configuration and documentation files
+!/.gitignore
+!/README.md
+!/LICENSE
+!/logo.jpg
+!/hacs.json
+
+# Ignore python compile cache and metadata helper files
+**/__pycache__/
+**/*.pyc
+**/*.metadata.json

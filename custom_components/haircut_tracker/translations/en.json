@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Search Haircut Tracker Store",
+        "description": "Search for your local Haircut Tracker store by name, city, state, or zip code.",
+        "data": {
+          "search_query": "Search query"
+        }
+      },
+      "select_store": {
+        "title": "Select Location",
+        "description": "Choose your store from the matching results.",
+        "data": {
+          "store_code": "Store Location"
+        }
+      },
+      "options": {
+        "title": "Optional Features & Settings",
+        "description": "Provide your Haircut Tracker account credentials to enable tracking your haircut due status, favorite stylists' availability, and haircut history.",
+        "data": {
+          "email": "Email (Optional)",
+          "password": "Password (Optional)",
+          "haircut_frequency": "Preferred haircut interval (days)"
+        }
+      }
+    },
+    "error": {
+      "search_too_short": "Search query must be at least 2 characters.",
+      "no_stores_found": "No stores matched your search. Try another query.",
+      "invalid_auth": "Invalid email or password. Authenticating failed."
+    },
+    "abort": {
+      "already_configured": "This Haircut Tracker store location is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Haircut Tracker Settings",
+        "description": "Adjust the preferred haircut frequency threshold (days) for notifications.",
+        "data": {
+          "haircut_frequency": "Preferred haircut interval (days)"
+        }
+      }
+    }
+  }
+}

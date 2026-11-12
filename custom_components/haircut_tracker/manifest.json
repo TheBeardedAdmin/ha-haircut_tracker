@@ -1,0 +1,11 @@
+{
+  "domain": "haircut_tracker",
+  "name": "Haircut Tracker",
+  "codeowners": ["@TheBeardedAdmin"],
+  "config_flow": true,
+  "documentation": "https://github.com/TheBeardedAdmin/ha-haircut_tracker",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/TheBeardedAdmin/ha-haircut_tracker/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
