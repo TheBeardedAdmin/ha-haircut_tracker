@@ -9,6 +9,20 @@ A Home Assistant custom integration to monitor wait times, queue status, stylist
 > [!NOTE]
 > This integration currently supports **SportClips** locations. Support for other popular hair salons and chains is planned for future releases.
 
+## About
+
+**Haircut Tracker** is a Home Assistant custom component designed to streamline your grooming routine and eliminate the guesswork of timing your salon visits.
+
+Instead of manually checking store apps or showing up to unexpected 90-minute wait times, Haircut Tracker integrates directly into your smart home dashboard and automation engine:
+
+- ⏱️ **Live Waitboard Monitoring**: Keep an eye on real-time store queues and estimated wait times from any Home Assistant dashboard or wall panel.
+- 💈 **Preferred Stylist Tracking**: Automatically cross-references your past haircut history to identify your favorite stylists and notify you when they are on the clock.
+- 📅 **Intelligent Due Reminders**: Calculates the elapsed days since your last haircut and pairs with your preferred interval (e.g. every 21 or 30 days) to trigger reminders only when a trim is actually needed.
+- 🧠 **Best Day Predictor**: Analyzes weekly working schedules across all your preferred stylists to highlight the optimal day(s) to visit.
+- ⚡ **Resource-Friendly Smart Polling**: Built with a polite polling algorithm that automatically sleeps when the store is closed and wakes up at opening time, preventing unnecessary network traffic.
+
+---
+
 ## Features
 * **Wait Time Sensor**: Tracks the current estimated wait time at your local store.
 * **Queue Size Sensor**: Tracks the number of checked-in clients and shows the live lineup status in its attributes.
