@@ -4,6 +4,10 @@
 # Allow custom_components folder and its contents
 !/custom_components/
 
+# Allow GitHub workflows and configuration
+!/.github/
+!/.github/**
+
 # Allow configuration and documentation files
 !/.gitignore
 !/README.md
