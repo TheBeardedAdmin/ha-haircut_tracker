@@ -8,8 +8,9 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 
 from typing import Any
-from .const import DOMAIN, CONF_STORE_CODE, CONF_STORE_NAME, CONF_EMAIL, CONF_PASSWORD, CONF_FREQUENCY, DEFAULT_FREQUENCY
+from .const import DOMAIN, CONF_STORE_CODE, CONF_STORE_NAME, CONF_EMAIL, CONF_PASSWORD, CONF_FREQUENCY, DEFAULT_FREQUENCY, CONF_METRICS
 from .api import HaircutTrackerAPI
+from .metrics import available_metrics, default_enabled
 
 class HaircutTrackerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Haircut Tracker."""
@@ -20,7 +21,7 @@ class HaircutTrackerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> HaircutTrackerOptionsFlowHandler:
         """Get the options flow for this handler."""
-        return HaircutTrackerOptionsFlowHandler(config_entry)
+        return HaircutTrackerOptionsFlowHandler()
 
     def __init__(self):
         """Initialize config flow."""
@@ -138,24 +139,27 @@ class HaircutTrackerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class HaircutTrackerOptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle options flow for Haircut Tracker."""
-
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
+    """Handle options flow for Haircut Tracker (interval + which metrics to collect)."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Manage the options."""
+        entry = self.config_entry
+        has_auth = bool(entry.data.get(CONF_EMAIL) and entry.data.get(CONF_PASSWORD))
+
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        current_freq = self.config_entry.options.get(
-            CONF_FREQUENCY, self.config_entry.data.get(CONF_FREQUENCY, DEFAULT_FREQUENCY)
-        )
+        current_freq = entry.options.get(CONF_FREQUENCY, entry.data.get(CONF_FREQUENCY, DEFAULT_FREQUENCY))
+        options = {m.key: m.label for m in available_metrics(has_auth)}
+        current = entry.options.get(CONF_METRICS)
+        if current is None:
+            current = default_enabled(has_auth)
+        current = [k for k in current if k in options]
 
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
                 vol.Required(CONF_FREQUENCY, default=current_freq): cv.positive_int,
+                vol.Required(CONF_METRICS, default=current): cv.multi_select(options),
             }),
         )

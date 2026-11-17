@@ -13,3 +13,5 @@ CONF_FREQUENCY = "haircut_frequency"
 CONF_FAVORITES = "favorite_stylists"
 
 DEFAULT_FREQUENCY = 30
+
+CONF_METRICS = "enabled_metrics"

@@ -24,16 +24,41 @@ Instead of manually checking store apps or showing up to unexpected 90-minute wa
 ---
 
 ## Features
-* **Wait Time Sensor**: Tracks the current estimated wait time at your local store.
-* **Queue Size Sensor**: Tracks the number of checked-in clients and shows the live lineup status in its attributes.
-* **Store Hours Sensor**: Shows today's store hours at a glance, with the full weekly hours schedule in its attributes.
-* **Online Check-In Status (Binary Sensor)**: Shows if online check-in is currently open/enabled.
-* **Haircut Due Status (Authenticated)**: Uses your Haircut Tracker history to calculate the days since your last haircut and lets you know when you are due based on your preferred interval.
-* **Favorite Stylist Sensor (Authenticated)**: Monitors if your preferred stylists (extracted from your haircut history) are working today and shows their active wait times.
-* **Best Day to Visit Sensor (Authenticated)**: Compares the weekly working schedules of all your favorite stylists and predicts the best day(s) to visit.
-* **Manual Refresh Button**: Exposes a `button` entity to trigger an adhoc update of all sensors instantly.
-* **Smart Polling & Hammering Prevention**: Auto-adjusts API polling intervals dynamically based on whether you are due, and polls only during store hours. Polling frequency (threshold) can be adjusted dynamically in the integration options.
+* **Choose your own metrics**: Open **Settings ? Devices & Services ? Haircut Tracker ? Configure** and tick only the metrics you want to collect. Unticked metrics are not created (existing entities for them are removed). See the full list below.
+* **Full weekly store schedule**: A *Weekly Schedule* sensor exposes every day's open/close time (plus holiday/special-hours flags) and a ready-made `markdown` attribute you can drop into a Markdown card.
+* **Store-hours aware polling**: The integration only talks to the API while the store is open. When the store closes it sleeps until 5 minutes after the next opening (using the store's own time zone), and never schedules a poll outside opening hours.
+* **Stylist roster cache**: The stylist endpoint only returns people while the store is open, so the last known roster and schedules are kept (and survive restarts).
+* **Manual Refresh Button**: Exposes a `button` entity to trigger an adhoc update instantly.
+* **Dynamic interval**: Polls every 15 minutes (during open hours) when you are due or within 3 days of due, otherwise about twice per open day. The haircut interval is adjustable in the options.
 
+## Available Metrics
+Metrics marked *default* are on out of the box; everything else is opt-in via **Configure**. "Account" metrics need your Haircut Tracker email/password.
+
+| Metric | Platform | Default | Account | State | Notable attributes |
+| :--- | :--- | :---: | :---: | :--- | :--- |
+| Wait Time | sensor | ? | | Current wait (`HH:MM:SS` / `Closed`) | address, phone, store_open, weekly_hours |
+| Queue Size | sensor | ? | | People in line | `queue_list` (client, stylist, wait, status) |
+| Store Hours | sensor | ? | | Today's hours | `weekly_hours` |
+| Weekly Schedule | sensor | ? | | Total open hours this week | `schedule` (per day), `summary`, `markdown`, special-hours days |
+| Status & Next Opening | sensor | ? | | Open / Closed | `next_open`, `pin_text`, store_time |
+| Expected Start Time | sensor | | | Next expected service start | |
+| Queue Breakdown | sensor | | | Queue length | counts by status and by stylist |
+| Check-In Cutoff | sensor | | | Online check-in hard stop (min) | early_arrival_minutes, max_wait_for_checkin_minutes |
+| Store Info | sensor | | | Store name | address, phone, lat/long, time zone, website/social links |
+| Online Check-In | binary_sensor | ? | | On/Off | see_stylist_enabled |
+| See Stylist Enabled | binary_sensor | | | On/Off | |
+| Store Open | binary_sensor | | | On/Off | store_state_code |
+| Haircut Due Status | sensor | ? | ? | Due / Ok | days_since, days_until_due, last stylist/service |
+| Favorite Stylists Status | sensor | ? | ? | First working favorite | favorite_schedules, best_days_to_visit, wait time |
+| Best Day to Visit | sensor | ? | ? | Day(s) most favorites work | |
+| Stylist Roster | sensor | ? | ? | Number of stylists | `roster`: every stylist's weekly hours |
+| Days Since Haircut | sensor | | ? | Days | |
+| Next Haircut Due | sensor (date) | | ? | Date | |
+| Average Days Between Visits | sensor | | ? | Days | total/avg spend, favorite weekday/hour, stylist & service counts, predicted next visit |
+| Stylists Working Today | sensor | | ? | Count | `working_today` with hours |
+
+> [!NOTE]
+> The stylist schedule endpoint returns no stylists while the store is closed. Roster-based metrics therefore show the last known data until the store reopens.
 ## Installation
 
 ### Method 1: HACS (Recommended)
@@ -56,6 +81,7 @@ Instead of manually checking store apps or showing up to unexpected 90-minute wa
 4. Search for your store by zip code, city, or name.
 5. (Optional) Provide your email and password to track haircut history and favorite stylists.
 6. Configure your preferred haircut frequency (default: 30 days).
+7. Afterwards, use **Configure** on the integration to choose which metrics to collect.
 
 ## Example Alert Automation
 Get notified on your phone when one of your favorite stylists is working and you are due for a haircut:

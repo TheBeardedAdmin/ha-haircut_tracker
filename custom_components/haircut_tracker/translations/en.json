@@ -38,9 +38,10 @@
     "step": {
       "init": {
         "title": "Haircut Tracker Settings",
-        "description": "Adjust the preferred haircut frequency threshold (days) for notifications.",
+        "description": "Choose how often you like a haircut and which metrics Haircut Tracker should collect. Unchecked metrics are not created (and existing entities for them are removed).",
         "data": {
-          "haircut_frequency": "Preferred haircut interval (days)"
+          "haircut_frequency": "Preferred haircut interval (days)",
+          "enabled_metrics": "Metrics to collect"
         }
       }
     }
