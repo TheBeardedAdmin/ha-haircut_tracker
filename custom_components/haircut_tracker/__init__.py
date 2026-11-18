@@ -22,9 +22,9 @@ from .const import (
     LOGGER,
 )
 from .api import HaircutTrackerAPI
-from .helpers import is_open_at, is_open_now, next_open_datetime, store_now
+from .helpers import is_open_at, is_open_now, next_open_datetime, store_now, stylist_name
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON, Platform.CALENDAR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -133,6 +133,17 @@ class HaircutTrackerDataUpdateCoordinator(DataUpdateCoordinator):
                     if is_open_now(store_info) or not self.stylists_cache:
                         lineup = await self.api.get_stylist_lineup()
                         if lineup.get("stylists"):
+                            # Merge newly fetched stylists into persistent cache by UID / name
+                            merged = {
+                                (s.get("uid") or stylist_name(s)): s
+                                for s in self.stylists_cache.get("stylists", [])
+                                if (s.get("uid") or stylist_name(s))
+                            }
+                            for s in lineup.get("stylists", []):
+                                key = s.get("uid") or stylist_name(s)
+                                if key:
+                                    merged[key] = s
+                            lineup["stylists"] = list(merged.values())
                             self.stylists_cache = lineup
                             self.stylists_updated = datetime.now()
                             await self._store.async_save(

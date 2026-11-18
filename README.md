@@ -25,9 +25,9 @@ Instead of manually checking store apps or showing up to unexpected 90-minute wa
 
 ## Features
 * **Choose your own metrics**: Open **Settings ? Devices & Services ? Haircut Tracker ? Configure** and tick only the metrics you want to collect. Unticked metrics are not created (existing entities for them are removed). See the full list below.
-* **Full weekly store schedule**: A *Weekly Schedule* sensor exposes every day's open/close time (plus holiday/special-hours flags) and a ready-made `markdown` attribute you can drop into a Markdown card.
-* **Store-hours aware polling**: The integration only talks to the API while the store is open. When the store closes it sleeps until 5 minutes after the next opening (using the store's own time zone), and never schedules a poll outside opening hours.
-* **Stylist roster cache**: The stylist endpoint only returns people while the store is open, so the last known roster and schedules are kept (and survive restarts).
+* **Native Stylist Calendar**: Integrates with Home Assistant's built-in **Calendar** (`calendar.haircut_tracker_[store]_stylists`). Every stylist's shift appears on your Home Assistant calendar view and in core Calendar dashboard cards!
+* **Full weekly store schedule & stylist roster**: Exposes ready-made `markdown` table attributes on both the *Weekly Schedule* and *Stylist Roster* sensors so you can display full master schedule tables in your dashboard with one line.
+* **Cumulative Stylist Roster Cache**: Because SportClips only returns stylists scheduled for the current day, the integration automatically merges and caches every stylist across days so you maintain the complete roster even when stylists are off.
 * **Manual Refresh Button**: Exposes a `button` entity to trigger an adhoc update instantly.
 * **Dynamic interval**: Polls every 15 minutes (during open hours) when you are due or within 3 days of due, otherwise about twice per open day. The haircut interval is adjustable in the options.
 
@@ -51,7 +51,8 @@ Metrics marked *default* are on out of the box; everything else is opt-in via **
 | Haircut Due Status | sensor | ? | ? | Due / Ok | days_since, days_until_due, last stylist/service |
 | Favorite Stylists Status | sensor | ? | ? | First working favorite | favorite_schedules, best_days_to_visit, wait time |
 | Best Day to Visit | sensor | ? | ? | Day(s) most favorites work | |
-| Stylist Roster | sensor | ? | ? | Number of stylists | `roster`: every stylist's weekly hours |
+| Stylist Roster | sensor | ✅ | ✅ | Number of stylists | `roster`, `markdown` (full master table) |
+| Stylist Calendar | calendar | ✅ | ✅ | Next shift | Native HA calendar with each stylist's shift |
 | Days Since Haircut | sensor | | ? | Days | |
 | Next Haircut Due | sensor (date) | | ? | Date | |
 | Average Days Between Visits | sensor | | ? | Days | total/avg spend, favorite weekday/hour, stylist & service counts, predicted next visit |

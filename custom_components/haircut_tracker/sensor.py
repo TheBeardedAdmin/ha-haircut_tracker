@@ -334,9 +334,21 @@ def roster_attrs(c):
         for row in week_table(s.get("weeklySchedules", []), today):
             week[row["day"]] = row["hours"].replace("Closed", "Off")
         roster[stylist_name(s)] = week
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    md = [
+        f"| Stylist | {' | '.join(d[:3] for d in days)} |",
+        f"| :--- | {' | '.join([':---:'] * 7)} |"
+    ]
+    for name in sorted(roster):
+        sched = roster[name]
+        row_cells = [sched.get(d, 'Off') for d in days]
+        md.append(f"| **{name}** | {' | '.join(row_cells)} |")
+
     return {
         "stylists": sorted(roster),
         "roster": roster,
+        "markdown": "\n".join(md),
         "live_data": (c.data or {}).get("stylists_live", False),
         "last_updated_with_stylists": c.stylists_updated.isoformat(timespec="minutes") if c.stylists_updated else None,
         "note": "Stylist schedules are only returned by the API while the store is open; the last known roster is kept in between.",
