@@ -90,7 +90,7 @@ class HaircutTrackerDataUpdateCoordinator(DataUpdateCoordinator):
         self._store = Store(hass, 1, f"{DOMAIN}_{api.store_code}_stylists")
 
     async def async_load_cache(self) -> None:
-        """Restore the last known stylist roster (survives restarts)."""
+        """Restore the last known stylist roster (survives restarts) and seed known stylists."""
         saved = await self._store.async_load()
         if saved and saved.get("lineup"):
             self.stylists_cache = saved["lineup"]
@@ -98,6 +98,36 @@ class HaircutTrackerDataUpdateCoordinator(DataUpdateCoordinator):
                 self.stylists_updated = datetime.fromisoformat(saved.get("updated"))
             except (TypeError, ValueError):
                 self.stylists_updated = None
+
+        # Seed known stylists if not yet in cache
+        now = datetime.now()
+        sunday = now.date() - timedelta(days=(now.isoweekday() % 7))
+        from .seeds import get_seed_stylists
+        seeds = get_seed_stylists(self.api.store_code, sunday)
+        if seeds:
+            merged = {
+                (s.get("uid") or stylist_name(s)): s
+                for s in self.stylists_cache.get("stylists", [])
+                if (s.get("uid") or stylist_name(s))
+            }
+            added = False
+            for seed in seeds:
+                key = seed.get("uid") or stylist_name(seed)
+                if key and key not in merged:
+                    merged[key] = seed
+                    added = True
+            if added:
+                self.stylists_cache.setdefault("services", [])
+                self.stylists_cache["stylists"] = list(merged.values())
+                if not self.stylists_updated:
+                    self.stylists_updated = now
+                await self._store.async_save(
+                    {"lineup": self.stylists_cache, "updated": self.stylists_updated.isoformat()}
+                )
+                LOGGER.info(
+                    "Haircut Tracker: Seeded initial stylists into cache for store %s",
+                    self.api.store_code,
+                )
 
     async def _async_update_data(self) -> dict:
         """Fetch data from Haircut Tracker API."""
